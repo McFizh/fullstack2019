@@ -1,0 +1,23 @@
+title 0.6: Uusi muistiinpano
+
+
+note over selain:
+Käyttäjä kirjoittaa uuden muistiinpanon ja painaa
+tallenna nappia
+end note
+
+note over selain:
+Selain lisää muistiinpanon välittömästi sivun DOM puuhun. Tämän 
+jälkeen muistiinpanon sisältö lähetetään taustalla palvelimelle.
+end note
+
+
+selain->palvelin: HTTP POST https://fullstack-exampleapp.herokuapp.com/new_note_spa
+
+note over palvelin:
+Palvelin vastaanottaa muistiinpanon POST pyynnön
+sisällä tulleesta JSON paketista ja tallentaa sen
+end note
+
+palvelin-->selain: HTTP KOODI 201 (created) + {"message":"note created"} JSON viesti
+

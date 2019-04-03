@@ -1,0 +1,41 @@
+title 0.4: Uusi muistiinpano
+
+note over selain:
+Käyttäjä kirjoittaa uuden muistiinpanon ja painaa 
+talleta nappia
+end note
+
+selain->palvelin: HTTP POST https://fullstack-exampleapp.herokuapp.com/new_note
+
+note over palvelin:
+Palvelin tallentaa POST pyynnössä tulleen 
+muistiinpanon ja ohjaa selainta lataamaan 
+sivun uudestaan
+end note
+
+palvelin-->selain: HTTP koodi 302 (uudelleenohjaus osoitteeseen /notes)
+selain->palvelin: HTTP GET https://fullstack-exampleapp.herokuapp.com/notes
+palvelin-->selain: HTML-koodi
+
+note over selain:
+Selain käsittelee HTML-koodin ja lataa siihen 
+liittyvät sivuelementit
+end note
+
+selain->palvelin: HTTP GET https://fullstack-exampleapp.herokuapp.com/main.css
+palvelin-->selain: Sivun tyylitiedosto 
+selain->palvelin: HTTP GET https://fullstack-exampleapp.herokuapp.com/main.js
+palvelin-->selain: Sivun javascript koodi
+
+note over selain:
+Selain suorittaa sivun javascript koodin ja lataa
+tämän seurauksena muistiinpanot palvelimelta
+end note
+
+selain->palvelin: HTTP GET https://fullstack-exampleapp.herokuapp.com/data.json
+palvelin-->selain: Muistiinpanot JSON muodossa
+
+note over selain:
+Selain esittää muistiinpanot sivulla (mukaan
+lukien uuden muistiinpanon)
+end note
