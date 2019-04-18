@@ -1,5 +1,5 @@
-import React from 'react'
-import ReactDOM from 'react-dom'
+import React from 'react';
+import ReactDOM from 'react-dom';
 import Course from './course.js';
 
 const App = () => {
@@ -46,6 +46,7 @@ const App = () => {
 
   return (
     <div>
+      <h1>Opetusohjelma:</h1>
       {courses.map((course, idx) => { return (
         <Course course={course} key={idx}/>
       ) } )}

@@ -1,8 +1,8 @@
-import React from 'react'
+import React from 'react';
 
 const Header = ({course}) => {
   return (
-    <h1>{course}</h1>
+    <h2>{course}</h2>
   )
 }
 
