@@ -18,10 +18,10 @@ const App = () => {
   const [searchVal, setNewSearchVal] = useState('');
   const [notification, setNotification] = useState(null);
 
-  useEffect( () => {
+  useEffect(() => {
     Persons
       .getAll()
-      .then( pdata => setPersons(pdata) );
+      .then(pdata => setPersons(pdata));
   }, []);
 
   const searchValChange = e => {
@@ -38,64 +38,88 @@ const App = () => {
 
   const deletePerson = person => {
     const repl = window.confirm(`Poistetaanko ${person.name}?`);
-    if(!repl) {
+    if (!repl) {
       return;
     }
 
     Persons
       .deletePerson(person)
-      .then( () => {
-        setPersons( persons.filter( p => p.id !== person.id ) );
-      } );
+      .then(() => {
+        setPersons(persons.filter(p => p.id !== person.id));
+        setNotification({
+          msg: `Poistettiin henkilön ${person.name} tiedot`,
+          type: 'success'
+        });
+        setTimeout(() => { setNotification(null) }, 3000);
+      })
+      .catch(err => {
+        setNotification({
+          msg: `Henkilön ${person.name} tietojen poisto epäonnistui`,
+          type: 'error'
+        });
+        setTimeout(() => { setNotification(null) }, 3000);
+      });
   }
 
   const addNewClick = e => {
     e.preventDefault();
 
-    const person = persons.find( (person) => person.name === newName );
-    if(person) {
+    const person = persons.find((person) => person.name === newName);
+    if (person) {
       const repl = window.confirm(`${newName} on jo luettelossa, korvataanko vanha numero uudella?`);
-      if(repl) {
+      if (repl) {
         person.number = newNum;
         Persons
           .update(person)
-          .then( updPerson => {
-            setPersons( persons.map( p => p.id !== updPerson.id ? p : updPerson ) );
+          .then(updPerson => {
+            setPersons(persons.map(p => p.id !== updPerson.id ? p : updPerson));
             setNewName('');
             setNewNum('');
+            setNotification({
+              msg: `Päivitettiin henkilön ${person.name} tiedot`,
+              type: 'success'
+            });
+            setTimeout(() => { setNotification(null) }, 3000);
+          })
+          .catch(err => {
+            setNotification({
+              msg: `Henkilön ${person.name} tietojen päivitys epäonnistui`,
+              type: 'error'
+            });
+            setTimeout(() => { setNotification(null) }, 3000);
           });
       }
       return;
     }
 
     Persons
-      .create({name: newName, number: newNum })
-      .then( newPerson => {
-        setPersons( persons.concat(newPerson) );
+      .create({ name: newName, number: newNum })
+      .then(newPerson => {
+        setPersons(persons.concat(newPerson));
         setNewName('');
         setNewNum('');
         setNotification({
           msg: `Lisättiin ${newPerson.name}`,
           type: 'success'
         });
-        setTimeout( () => { setNotification(null) }, 3000);
-      } );
+        setTimeout(() => { setNotification(null) }, 3000);
+      });
   }
 
-  const filteredPersons = persons.filter( (person) => {
+  const filteredPersons = persons.filter((person) => {
     return searchVal.length === 0 || person.name.toLocaleLowerCase().includes(searchVal.toLocaleLowerCase());
-  } );
+  });
 
   return (
     <div>
       <h2>Puhelinluettelo</h2>
-      <Notification note={notification}/>
-      <FilterValues searchVal={searchVal} searchValChange={ searchValChange }/>
+      <Notification note={notification} />
+      <FilterValues searchVal={searchVal} searchValChange={searchValChange} />
       <NewEntry newName={newName} newNum={newNum}
         newNameChange={newNameChange}
         newNumChange={newNumChange}
-        addNewClick={addNewClick}/>
-      <BookEntries data={filteredPersons} deletePerson={deletePerson}/>
+        addNewClick={addNewClick} />
+      <BookEntries data={filteredPersons} deletePerson={deletePerson} />
     </div>
   )
 }
