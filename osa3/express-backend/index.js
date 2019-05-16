@@ -2,45 +2,49 @@ const express = require('express');
 const morgan = require('morgan');
 const cors = require('cors');
 const bodyParser = require('body-parser');
+const db = require('./lib/database');
 
 const app = express();
 
-let persons = [
-  {
-    "name": "Arto Hellas",
-    "number": "040-123456",
-    "id": 1
-  }, {
-    "name": "Martti Tienari",
-    "number": "040-123456",
-    "id": 2
-  }, {
-    "name": "Arto Järvinen",
-    "number": "040-123456",
-    "id": 3
-  }, {
-    "name": "Lea Kutvonen",
-    "number": "040-123456",
-    "id": 4
-  }
-];
+require('dotenv').config();
 
-function generateId() {
-  return Math.floor(Math.random()*10000000);
+const dburl = process.env.DB_URL;
+const PORT = process.env.PORT;
+
+if(!dburl) {
+  console.log('Missing database url');
+  process.exit(-1);
 }
+
+db.connect(dburl);
 
 morgan.token('post-data', (req, res) => JSON.stringify(req.body) );
 
-app.use(morgan(':method :url :status :res[content-length] - :response-time ms :post-data'));
-app.use(bodyParser.json());
 app.use(express.static('build'));
+app.use(bodyParser.json());
 app.use(cors());
+app.use(morgan(':method :url :status :res[content-length] - :response-time ms :post-data'));
 
-app.get('/api/persons', (req, res) => {
-  res.json(persons)
+
+const errorHandler = (error, request, response, next) => {
+  console.error(error.message);
+
+  if (error.name === 'CastError' && error.kind === 'ObjectId') {
+    return response.status(400).send({ error: 'malformatted id' });
+  }
+
+  next(error);
+};
+
+app.use(errorHandler);
+
+
+app.get('/api/persons', async (req, res, next) => {
+  const persons = await db.getPersons();
+  res.json(persons);
 });
 
-app.post('/api/persons', (req, res) => {
+app.post('/api/persons', async (req, res, next) => {
   const name = req.body.name;
   const number = req.body.number;
 
@@ -54,21 +58,18 @@ app.post('/api/persons', (req, res) => {
     return;
   }
 
-  if( persons.find( p => p.name === name ) ) {
+  const person = await db.getPersonByName(name);
+  if( person ) {
     res.status(409).json({ error: 'Name already in phonebook' });
     return;
   }
 
-  const id = generateId();
-  const person = { name, number, id };
-  persons.push(person);
-
-  res.json(person);
+  const newPerson = await db.newPerson(name, number);
+  res.json(newPerson);
 });
 
-app.get('/api/persons/:id', (req, res) => {
-  const id = Number(req.params.id);
-  const person = persons.find( p => p.id === id );
+app.get('/api/persons/:id', async (req, res, next) => {
+  const person = await db.getPersonById(req.params.id);
   if(person) {
     res.json(person);
   } else {
@@ -76,25 +77,24 @@ app.get('/api/persons/:id', (req, res) => {
   }
 });
 
-app.delete('/api/persons/:id', (req, res) => {
-  const id = Number(req.params.id);
-  const person = persons.find( p => p.id === id );
+app.delete('/api/persons/:id', async (req, res, next) => {
+  const person = await db.getPersonById(req.params.id);
   if(person) {
-    persons = persons.filter( p => p.id !== id );
+    db.removePerson(req.params.id);
     res.status(204).end();
   } else {
     res.status(404).end();
   }
 });
 
-app.get('/info', (req, res) => {
+app.get('/info', async (req, res, next) => {
+  const persons = await db.getPersons();
+
   let output = `Puhelinluettelossa ${persons.length} henkilön tiedot<br/><br/>`;
   output += `${new Date()}<br/>`;
   res.send(output);
 });
 
-
-const PORT = 3001
 app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`)
+  console.log(`>> Server running on port ${PORT}`);
 });
