@@ -8,16 +8,18 @@ const app = express();
 
 require('dotenv').config();
 
+// Luodaan yhteys tietokantaan
 const dburl = process.env.DB_URL;
 const PORT = process.env.PORT;
 
 if(!dburl) {
-  console.log('Missing database url');
+  console.log('Missing database url, please set it in .env file');
   process.exit(-1);
 }
 
 db.connect(dburl);
 
+// Express middlewaret
 morgan.token('post-data', (req, res) => JSON.stringify(req.body) );
 
 app.use(express.static('build'));
@@ -38,7 +40,7 @@ const errorHandler = (error, request, response, next) => {
 
 app.use(errorHandler);
 
-
+// Express reitit
 app.get('/api/persons', async (req, res, next) => {
   const persons = await db.getPersons();
   res.json(persons);

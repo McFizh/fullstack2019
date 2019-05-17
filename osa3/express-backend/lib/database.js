@@ -1,10 +1,6 @@
 const Mongoose = require('mongoose');
 const Person = require('../models/person');
 
-function generateId() {
-  return Math.floor(Math.random()*99999999);
-}
-
 function connect(dbUrl) {
   Mongoose
     .connect(dbUrl, { useNewUrlParser: true })
@@ -22,7 +18,7 @@ async function getPersons() {
 }
 
 async function getPersonById(id) {
-  return await Person.find({ id });
+  return await Person.find({ _id: id });
 }
 
 async function getPersonByName(name) {
@@ -30,8 +26,6 @@ async function getPersonByName(name) {
 }
 
 async function newPerson(name, number) {
-  const id = generateId();
-
   const person = new Person({
     name,
     number
