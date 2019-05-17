@@ -4,7 +4,7 @@ const Person = require('../models/person');
 function connect(dbUrl) {
   Mongoose
     .connect(dbUrl, { useNewUrlParser: true })
-    .then(res => {
+    .then(() => {
       console.log('>> Connected to MongoDB');
     })
     .catch(err => {
@@ -13,33 +13,35 @@ function connect(dbUrl) {
     });
 }
 
-async function getPersons() {
-  return await Person.find({});
+function getPersons() {
+  return Person.find({});
 }
 
-async function getPersonById(id) {
-  return await Person.find({ _id: id });
+function getPersonById(id) {
+  return Person.findOne({ _id: id });
 }
 
-async function getPersonByName(name) {
-  return await Person.find({ name });
+function getPersonByName(name) {
+  return Person.findOne({ name });
 }
 
-async function newPerson(name, number) {
+function newPerson(name, number) {
   const person = new Person({
     name,
     number
   });
 
-  return await person.save();
+  return person.save();
 }
 
-async function updatePerson(name, number) {
-
+function updatePerson(name, number, person) {
+  person.name = name;
+  person.number = number;
+  return person.save();
 }
 
-async function removePerson(id) {
-
+function removePerson(id) {
+  return Person.deleteOne({ _id: id });
 }
 
 module.exports = {

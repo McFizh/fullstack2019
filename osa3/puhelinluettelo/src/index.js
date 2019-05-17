@@ -10,7 +10,6 @@ import Persons from './services/persons';
 
 import './index.css';
 
-
 const App = () => {
   const [persons, setPersons] = useState([]);
   const [newName, setNewName] = useState('');
@@ -101,6 +100,14 @@ const App = () => {
         setNotification({
           msg: `Lisättiin ${newPerson.name}`,
           type: 'success'
+        });
+        setTimeout(() => { setNotification(null) }, 3000);
+      })
+      .catch(err => {
+        const errMsg = err.response.data.error;
+        setNotification({
+          msg: `${errMsg}`,
+          type: 'error'
         });
         setTimeout(() => { setNotification(null) }, 3000);
       });
