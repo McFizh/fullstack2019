@@ -16,6 +16,7 @@ mongoose.connect(
 );
 
 if (process.argv.length === 3) {
+  console.log('Puhelinluettelo:');
   Person
     .find({})
     .then(persons => {
