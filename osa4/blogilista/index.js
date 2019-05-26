@@ -1,44 +1,18 @@
-const http = require('http')
-const express = require('express')
-const app = express()
-const bodyParser = require('body-parser')
-const cors = require('cors')
-const mongoose = require('mongoose')
+const express = require('express');
+const app = express();
+const BodyParser = require('body-parser');
+const Cors = require('cors');
+const mongoose = require('mongoose');
+const BlogsRouter = require('./controllers/blogs');
+const Config = require('./utils/config');
 
-const blogSchema = mongoose.Schema({
-  title: String,
-  author: String,
-  url: String,
-  likes: Number
-})
+mongoose.connect(Config.DBURL, { useNewUrlParser: true });
 
-const Blog = mongoose.model('Blog', blogSchema)
+app.use(Cors());
+app.use(BodyParser.json());
 
-const mongoUrl = 'mongodb://localhost/bloglist'
-mongoose.connect(mongoUrl, { useNewUrlParser: true })
+app.use('/api/blogs', BlogsRouter);
 
-app.use(cors())
-app.use(bodyParser.json())
-
-app.get('/api/blogs', (request, response) => {
-  Blog
-    .find({})
-    .then(blogs => {
-      response.json(blogs)
-    })
-})
-
-app.post('/api/blogs', (request, response) => {
-  const blog = new Blog(request.body)
-
-  blog
-    .save()
-    .then(result => {
-      response.status(201).json(result)
-    })
-})
-
-const PORT = 3003
-app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`)
-})
+app.listen(Config.PORT, () => {
+  console.log(`Server running on port ${Config.PORT}`);
+});
