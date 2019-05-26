@@ -1,18 +1,9 @@
-const express = require('express');
-const app = express();
-const BodyParser = require('body-parser');
-const Cors = require('cors');
-const mongoose = require('mongoose');
-const BlogsRouter = require('./controllers/blogs');
-const Config = require('./utils/config');
+const app = require('./app');
+const http = require('http');
+const config = require('./utils/config');
 
-mongoose.connect(Config.DBURL, { useNewUrlParser: true });
+const server = http.createServer(app);
 
-app.use(Cors());
-app.use(BodyParser.json());
-
-app.use('/api/blogs', BlogsRouter);
-
-app.listen(Config.PORT, () => {
-  console.log(`Server running on port ${Config.PORT}`);
+server.listen(config.PORT, () => {
+  console.log(`Server running on port ${config.PORT}`);
 });
