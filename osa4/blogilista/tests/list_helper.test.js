@@ -120,7 +120,7 @@ describe('most blogs', () => {
 describe('most likes', () => {
   const correctResult = {
     author: 'Edsger W. Dijkstra',
-    blogs: 17
+    likes: 17
   };
 
   test('list with multiple items, returns correct value', () => {
