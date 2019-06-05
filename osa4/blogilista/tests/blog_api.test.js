@@ -24,7 +24,37 @@ test('notes are returned as json', async () => {
     .get('/api/blogs')
     .expect(200)
     .expect('Content-Type', /application\/json/);
-  expect(response.body.length).toBe(6);
+  expect(response.body.length).toBe(MockData.listWithMultipleblogs.length);
+
+  // 4.9
+  expect(response.body[0].id).toBeDefined();
+});
+
+test('adding note works', async () => {
+  // 4.10
+  await Api
+    .post('/api/blogs')
+    .send({ title: 'title', author: 'author', url: 'http://www.google.fi' });
+  const rsp2 = await Api
+    .get('/api/blogs')
+    .expect(200);
+  expect(rsp2.body.length).toBe(MockData.listWithMultipleblogs.length+1);
+  const note = rsp2.body[6];
+  expect(note.title).toBe('title');
+
+  // 4.11
+  expect(note.likes).toBeDefined();
+  expect(note.likes).toBe(0);
+
+  // 4.12
+  await Api
+    .post('/api/blogs')
+    .send({ author: 'author', url: 'http://www.google.fi' })
+    .expect(400);
+  await Api
+    .post('/api/blogs')
+    .send({ title: 'title', author: 'author' })
+    .expect(400);
 });
 
 afterAll(() => {
