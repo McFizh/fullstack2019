@@ -7,7 +7,7 @@ const BlogsRouter = require('./controllers/blogs');
 const UsersRouter = require('./controllers/users');
 const LoginRouter = require('./controllers/login');
 const Config = require('./utils/config');
-const Middleware = require('./middleware/middleware');
+const Middleware = require('./utils/middleware');
 
 mongoose.connect(Config.DB_URL, { useNewUrlParser: true });
 
@@ -19,6 +19,7 @@ app.use('/api/blogs', BlogsRouter);
 app.use('/api/users', UsersRouter);
 app.use('/api/login', LoginRouter);
 
+app.use(Middleware.unknownEndpoint);
 app.use(Middleware.errorHandler);
 
 module.exports = app;

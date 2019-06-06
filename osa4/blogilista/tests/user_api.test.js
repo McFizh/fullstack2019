@@ -23,18 +23,23 @@ test('creating and listing user works', async () => {
   expect(rsp.body.length).toBe(1);
 
   // Yritetään luoda käyttäjä ilman tunnusta / salasanaa + duplikaattitunnus (4.16)
-  await Api
+  const res1 = await Api
     .post('/api/users')
     .send({ name: 'Teppo testaaja', password: 'testi' })
     .expect(400);
-  await Api
+  expect(res1.body.error).toContain('User validation failed');
+
+  const res2 = await Api
     .post('/api/users')
     .send({ username: 'testi2', name: 'Teppo testaaja' })
     .expect(400);
-  await Api
+  expect(res2.body.error).toContain('password missing or shorter');
+
+  const res3 = await Api
     .post('/api/users')
     .send({ username: 'testi', name: 'Teppo testaaja', password: 'testi' })
     .expect(400);
+  expect(res3.body.error).toContain('User validation failed');
 });
 
 /* ::::::::::::::::::::::::::::::::::::::::::::::::::::::: */

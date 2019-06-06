@@ -5,12 +5,16 @@ const Blog = require('../models/blog');
 const MockData = require('./moc_blog_data');
 
 const Api = Supertest(App);
-let testUser = null;
+let testUserToken = null;
+let testUserId = null;
 
 beforeAll( async () => {
-  testUser = ( await Api
+  testUserId = (await Api
     .post('/api/users')
-    .send({ username: 'apitest', name: 'Teppo testaaja', password: 'apitest' }) ).body;
+    .send({ username: 'apitest', name: 'Teppo testaaja', password: 'apitest' })).body.id;
+  testUserToken = (await Api
+    .post('/api/login')
+    .send({ username: 'apitest', password: 'apitest' })).body.token;
 });
 
 beforeEach(async () => {
@@ -18,6 +22,7 @@ beforeEach(async () => {
   let promiseList = [];
 
   MockData.listWithMultipleblogs.forEach( blogData => {
+    blogData.user = testUserId;
     const blog = new Blog( blogData );
     promiseList.push( blog.save() );
   });
@@ -42,6 +47,7 @@ test('adding blog works', async () => {
   // 4.10
   await Api
     .post('/api/blogs')
+    .set('authorization', 'bearer '+testUserToken)
     .send({ title: 'title', author: 'author', url: 'http://www.google.fi' })
     .expect(201);
   const rsp2 = await Api
@@ -58,10 +64,12 @@ test('adding blog works', async () => {
   // 4.12
   await Api
     .post('/api/blogs')
+    .set('authorization', 'bearer '+testUserToken)
     .send({ author: 'author', url: 'http://www.google.fi' })
     .expect(400);
   await Api
     .post('/api/blogs')
+    .set('authorization', 'bearer '+testUserToken)
     .send({ title: 'title', author: 'author' })
     .expect(400);
 });
@@ -75,6 +83,7 @@ test('removing and updating blog works', async () => {
   // 4.13
   await Api
     .del('/api/blogs/'+rsp1.body[0].id)
+    .set('authorization', 'bearer '+testUserToken)
     .expect(204);
   const rsp2 = await Api
     .get('/api/blogs')
@@ -84,6 +93,7 @@ test('removing and updating blog works', async () => {
   // 4.14
   await Api
     .put('/api/blogs/'+rsp1.body[1].id)
+    .set('authorization', 'bearer '+testUserToken)
     .send({ likes: 20 })
     .expect(200);
   const rsp3 = await Api

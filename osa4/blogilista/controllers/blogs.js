@@ -44,7 +44,7 @@ blogsRouter.delete('/:id', async (request, response, next) => {
     }
 
     const decodedToken = Jwt.verify(request.token, process.env.SECRET);
-    if(decodedToken.id !== blog.user) {
+    if(String(decodedToken.id) !== String(blog.user)) {
       return response.status(401).json({ error: 'not authorized, blog owner differs' });
     }
 
@@ -68,7 +68,12 @@ blogsRouter.put('/:id', async (request, response, next) => {
   try {
     const blog = await Blog.findOne({ _id: request.params.id });
     if(!blog) {
-      response.status(404).json({ error: 'blog not found' });
+      return response.status(404).json({ error: 'blog not found' });
+    }
+
+    const decodedToken = Jwt.verify(request.token, process.env.SECRET);
+    if(String(decodedToken.id) !== String(blog.user)) {
+      return response.status(401).json({ error: 'not authorized, blog owner differs' });
     }
 
     blog.likes = request.body.likes || 0;

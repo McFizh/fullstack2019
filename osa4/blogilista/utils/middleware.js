@@ -11,6 +11,11 @@ const tokenExtractor = (req, res, next) => {
   next();
 };
 
+// 404 käsittelijä
+const unknownEndpoint = (req, res) => {
+  res.status(404).send({ error: 'unknown endpoint' });
+};
+
 // Virhekäsittelijä
 const errorHandler = (err, req, res, next) => {
   if (err.name === 'CastError' && err.kind === 'ObjectId') {
@@ -27,6 +32,7 @@ const errorHandler = (err, req, res, next) => {
 };
 
 module.exports = {
+  unknownEndpoint,
   tokenExtractor,
   errorHandler
 };

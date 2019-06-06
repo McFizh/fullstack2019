@@ -12,7 +12,7 @@ usersRouter.get('/', async (request, response) => {
 usersRouter.post('/', async (req, res, next) => {
   try {
     if(!req.body.password || req.body.password.length<3) {
-      return res.status(400).send({ error: 'password missing or shorten than 3 characters' });
+      return res.status(400).send({ error: 'password missing or shorter than 3 characters' });
     }
 
     const userData = {
