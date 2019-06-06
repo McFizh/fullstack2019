@@ -1,5 +1,5 @@
 const listHelper = require('../utils/list_helper');
-const MockData = require('./moc_data');
+const MockData = require('./moc_blog_data');
 
 /* ::::::::::::::::::::::::::::::::::::::::::::::::::::::: */
 test('dummy returns one', () => {
@@ -32,12 +32,12 @@ describe('total likes', () => {
 describe('favorite blog', () => {
   test('list with one item, returns the item', () => {
     const result = listHelper.favoriteBlog(MockData.listWithOneBlog);
-    expect(result._id).toBe('5a422aa71b54a676234d17f8');
+    expect(result.title).toBe('Go To Statement Considered Harmful');
   });
 
   test('list with multiple items, returns correct item', () => {
     const result = listHelper.favoriteBlog(MockData.listWithMultipleblogs);
-    expect(result._id).toBe('5a422b3a1b54a676234d17f9');
+    expect(result.title).toBe('Canonical string reduction');
   });
 
 });
