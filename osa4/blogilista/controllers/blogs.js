@@ -1,6 +1,7 @@
 const blogsRouter = require('express').Router();
 const Blog = require('../models/blog.js');
 const User = require('../models/user.js');
+const Jwt = require('jsonwebtoken');
 
 blogsRouter.get('/', async (request, response) => {
   const result =  await Blog
@@ -17,10 +18,12 @@ blogsRouter.post('/', async (request, response, next) => {
     likes: request.body.likes || 0
   };
 
-  const user = await User.findOne({});
-  blogData.user = user._id;
-
   try {
+    const decodedToken = Jwt.verify(request.token, process.env.SECRET);
+
+    const user = await User.findOne({ _id: decodedToken.id });
+    blogData.user = user._id;
+
     const blog = new Blog(blogData);
     const result = await blog.save();
 
@@ -37,7 +40,12 @@ blogsRouter.delete('/:id', async (request, response, next) => {
   try {
     const blog = await Blog.findOne({ _id: request.params.id });
     if(!blog) {
-      response.status(404).json({ error: 'blog not found' });
+      return response.status(404).json({ error: 'blog not found' });
+    }
+
+    const decodedToken = Jwt.verify(request.token, process.env.SECRET);
+    if(decodedToken.id !== blog.user) {
+      return response.status(401).json({ error: 'not authorized, blog owner differs' });
     }
 
     await blog.deleteOne({ _id: request.params.id });
