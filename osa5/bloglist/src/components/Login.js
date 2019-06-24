@@ -1,16 +1,15 @@
 import React from 'react';
 
-const Login = ({ username, password, setUsername, setPassword, tryLogin }) => {
-
+const Login = ({ username, password, tryLogin }) => {
   const clickLogin = (e) => {
     e.preventDefault();
-    tryLogin(username, password);
+    tryLogin(username.value, password.value);
   };
 
   return (
     <div>
-      Username: <input type="text" value={username} onChange={ (e) => setUsername(e.target.value) }/><br/>
-      Password: <input type="password" value={password} onChange={ (e) => setPassword(e.target.value) } /><br/>
+      Username: <input { ...username } /><br/>
+      Password: <input { ...password }/><br/>
       <br/>
       <button onClick={clickLogin}>Login</button>
     </div>

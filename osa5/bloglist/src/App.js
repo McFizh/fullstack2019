@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import  { useField } from './hooks';
 
 import Blog from './components/Blog';
 import Login from './components/Login';
@@ -12,8 +13,6 @@ import Togglable from './components/Togglable';
 const App = () => {
   const [blogs, setBlogs] = useState([]);
   const [user, setUser] = useState(null);
-  const [username, setUsername] = useState('');
-  const [password, setPassword] = useState('');
 
   const [blogTitle, setBlogTitle] = useState('');
   const [blogAuthor, setBlogAuthor] = useState('');
@@ -21,7 +20,10 @@ const App = () => {
 
   const [notification, setNotification] = useState({});
 
-  const noteFormRef = React.createRef();
+  const [ username, resetUsername ] = useField('text');
+  const [ password, resetPassword ] = useField('password');
+
+  const blogFormRef = React.createRef();
 
   const tryLogin = async (username, password) => {
     try {
@@ -31,10 +33,9 @@ const App = () => {
       );
       setUser(res.data);
       BlogService.setToken(res.data.token);
-      setUsername('');
-      setPassword('');
+      resetUsername();
+      resetPassword();
     } catch(err) {
-      console.log('err state', err);
       setNotification({
         message: 'Wrong username/password',
         type: 'error'
@@ -65,14 +66,17 @@ const App = () => {
         author: blogAuthor,
         url: blogUrl
       } );
+
+      blogFormRef.current.toggleVisibility();
       fetchBlogs();
+
       setNotification({
         message: `New blog '${blogTitle}' created`,
         type: 'success'
       });
       setTimeout( () => setNotification({}), 3000 );
-      noteFormRef.current.toggleVisibility();
     } catch(err) {
+      console.log('err state', err);
       setNotification({
         message: 'Blog creation failed',
         type: 'error'
@@ -92,8 +96,10 @@ const App = () => {
 
   const removeAction = async ( blog ) => {
     try {
-      await BlogService.remove(blog.id);
-      fetchBlogs();
+      if(window.confirm('Do you want to remove blog?')) {
+        await BlogService.remove(blog.id);
+        fetchBlogs();
+      }
     } catch(err) {
       console.log(err);
     }
@@ -117,12 +123,10 @@ const App = () => {
         <h1>Login to application</h1>
         <Login
           username={username} password={password}
-          setUsername={setUsername} setPassword={setPassword}
           tryLogin={tryLogin}/>
       </div>
     );
   }
-
 
   return (
     <div>
@@ -135,7 +139,7 @@ const App = () => {
         <Blog key={blog.id} blog={blog} likeAction={likeAction} removeAction={removeAction} user={user}/>
       ) }
       <br/>
-      <Togglable buttonLabel='Create blog' ref={noteFormRef}>
+      <Togglable buttonLabel='Create blog' ref={blogFormRef}>
         <NewBlog
           blogTitle={blogTitle} blogAuthor={blogAuthor} blogUrl={blogUrl}
           setBlogTitle={setBlogTitle} setBlogAuthor={setBlogAuthor} setBlogUrl={setBlogUrl}
