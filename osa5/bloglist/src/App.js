@@ -14,9 +14,9 @@ const App = () => {
   const [blogs, setBlogs] = useState([]);
   const [user, setUser] = useState(null);
 
-  const [blogTitle, setBlogTitle] = useState('');
-  const [blogAuthor, setBlogAuthor] = useState('');
-  const [blogUrl, setBlogUrl] = useState('');
+  const [ blogTitle, resetTitle ] = useField('text');
+  const [ blogAuthor, resetAuthor ] = useField('text');
+  const [ blogUrl, resetUrl ] = useField('text');
 
   const [notification, setNotification] = useState({});
 
@@ -62,21 +62,23 @@ const App = () => {
     e.preventDefault();
     try {
       await BlogService.createBlog( {
-        title: blogTitle,
-        author: blogAuthor,
-        url: blogUrl
+        title: blogTitle.value,
+        author: blogAuthor.value,
+        url: blogUrl.value
       } );
 
       blogFormRef.current.toggleVisibility();
+      resetAuthor();
+      resetTitle();
+      resetUrl();
       fetchBlogs();
 
       setNotification({
-        message: `New blog '${blogTitle}' created`,
+        message: `New blog '${blogTitle.value}' created`,
         type: 'success'
       });
       setTimeout( () => setNotification({}), 3000 );
     } catch(err) {
-      console.log('err state', err);
       setNotification({
         message: 'Blog creation failed',
         type: 'error'
@@ -142,7 +144,6 @@ const App = () => {
       <Togglable buttonLabel='Create blog' ref={blogFormRef}>
         <NewBlog
           blogTitle={blogTitle} blogAuthor={blogAuthor} blogUrl={blogUrl}
-          setBlogTitle={setBlogTitle} setBlogAuthor={setBlogAuthor} setBlogUrl={setBlogUrl}
           createBlog={createBlog}
         />
       </Togglable>
