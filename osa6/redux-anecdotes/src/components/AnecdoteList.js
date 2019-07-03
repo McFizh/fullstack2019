@@ -1,35 +1,21 @@
 import React from 'react'
+import { connect } from 'react-redux'
 import { voteAnecdoteAction } from '../reducers/anecdoteReducer'
 import { setNotification, hideNotification } from '../reducers/notificationReducer'
 
 const AnecdoteList = (props) => {
-  const filter = props.store
-    .getState()
-    .filter
-    .toLocaleLowerCase();
-
-  const anecdotes = props.store
-    .getState()
-    .anecdotes
-    .filter( an => an.content.toLocaleLowerCase().includes(filter) )
-    .sort( (a,b) => (b.votes - a.votes) );
-
   const vote = (an) => {
-    props.store.dispatch(
-      voteAnecdoteAction(an.id)
-    );
+    props.voteAnecdoteAction(an.id)
+    props.setNotification(`You voted '${an.content}'`)
 
-    props.store.dispatch(
-      setNotification(`You voted '${an.content}'`)
-    );
     setTimeout( () => {
-      props.store.dispatch(hideNotification());
+      props.hideNotification();
     }, 5000);
   }
 
   return(
     <div>
-      {anecdotes.map(anecdote =>
+      {props.anecdotes.map(anecdote =>
         <div key={anecdote.id}>
           <div>
             {anecdote.content}
@@ -45,4 +31,25 @@ const AnecdoteList = (props) => {
 
 }
 
-export default AnecdoteList
+const filteredAnecdotes = ({anecdotes, filter}) => {
+  const lcfilter = filter.toLocaleLowerCase();
+
+  return anecdotes
+  .filter( an => an.content.toLocaleLowerCase().includes(lcfilter) )
+  .sort( (a,b) => (b.votes - a.votes) );
+}
+
+const mapStateToProps = (state) => {
+  return {
+    anecdotes: filteredAnecdotes(state),
+  }
+}
+
+const mapDispatchToProps = {
+  voteAnecdoteAction,
+  setNotification,
+  hideNotification
+}
+
+const ConnectedAnecdotes = connect(mapStateToProps,mapDispatchToProps)(AnecdoteList)
+export default ConnectedAnecdotes

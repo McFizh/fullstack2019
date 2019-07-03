@@ -1,4 +1,5 @@
 import React from 'react'
+import { connect } from 'react-redux'
 import { setFilter } from '../reducers/filterReducer'
 
 const Filter = (props) => {
@@ -7,7 +8,7 @@ const Filter = (props) => {
   }
 
   const filterChanged = (val) => {
-    props.store.dispatch( setFilter(val) );
+    props.setFilter(val);
   }
 
   return (
@@ -18,4 +19,9 @@ const Filter = (props) => {
   )
 }
 
-export default Filter
+const mapDispatchToProps = {
+  setFilter,
+}
+
+const ConnectedFilter = connect(null, mapDispatchToProps)(Filter)
+export default ConnectedFilter
