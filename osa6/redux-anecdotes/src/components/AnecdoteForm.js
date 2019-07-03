@@ -1,5 +1,6 @@
 import React from 'react'
 import { createAnecdoteAction } from '../reducers/anecdoteReducer'
+import { setNotification, hideNotification } from '../reducers/notificationReducer'
 
 const AnecdoteForm = (props) => {
 
@@ -14,9 +15,18 @@ const AnecdoteForm = (props) => {
     if(fld.value.length === 0) {
       return;
     }
+
     props.store.dispatch(
       createAnecdoteAction(fld.value)
     );
+
+    props.store.dispatch(
+      setNotification(`Anecdote created: '${fld.value}'`)
+    );
+    setTimeout( () => {
+      props.store.dispatch(hideNotification());
+    }, 5000);
+
     fld.value='';
   }
 
