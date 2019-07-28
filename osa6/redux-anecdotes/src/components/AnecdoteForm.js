@@ -1,7 +1,7 @@
 import React from 'react'
 import { connect } from 'react-redux'
 import { createAnecdoteAction } from '../reducers/anecdoteReducer'
-import { setNotification, hideNotification } from '../reducers/notificationReducer'
+import { setNotification } from '../reducers/notificationReducer'
 
 const AnecdoteForm = (props) => {
 
@@ -18,12 +18,7 @@ const AnecdoteForm = (props) => {
     }
 
     props.createAnecdoteAction(fld.value);
-    props.setNotification(`Anecdote created: '${fld.value}'`);
-
-    setTimeout( () => {
-      props.hideNotification();
-    }, 5000);
-
+    props.setNotification(`Anecdote created: '${fld.value}'`, 5);
     fld.value='';
   }
 
@@ -42,8 +37,7 @@ const AnecdoteForm = (props) => {
 
 const mapDispatchToProps = {
   createAnecdoteAction,
-  setNotification,
-  hideNotification
+  setNotification
 }
 
 const ConnectedAForm = connect(null,mapDispatchToProps)(AnecdoteForm)
