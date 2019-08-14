@@ -1,5 +1,5 @@
 import React from 'react';
-import { render,  waitForElement, prettyDOM } from '@testing-library/react';
+import { render,  waitForElement } from '@testing-library/react';
 jest.mock('./services/blogs');
 import App from './App';
 
