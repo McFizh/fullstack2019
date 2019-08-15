@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import  { useField } from './hooks';
+import { connect } from 'react-redux';
 
 import Blog from './components/Blog';
 import Login from './components/Login';
@@ -10,15 +11,15 @@ import BlogService from './services/blogs';
 import LoginService from './services/login';
 import Togglable from './components/Togglable';
 
-const App = () => {
-  const [blogs, setBlogs] = useState([]);
+import { setNotification } from './reducers/notificationReducer';
+import { fetchBlogs } from './reducers/blogReducer';
+
+const App = (props) => {
   const [user, setUser] = useState(null);
 
   const [ blogTitle, resetTitle ] = useField('text');
   const [ blogAuthor, resetAuthor ] = useField('text');
   const [ blogUrl, resetUrl ] = useField('text');
-
-  const [notification, setNotification] = useState({});
 
   const [ username, resetUsername ] = useField('text');
   const [ password, resetPassword ] = useField('password');
@@ -36,19 +37,12 @@ const App = () => {
       resetUsername();
       resetPassword();
     } catch(err) {
-      setNotification({
+      props.setNotification({
         message: 'Wrong username/password',
-        type: 'error'
+        type: 'error',
+        delay: 3
       });
-      setTimeout( () => setNotification({}), 3000 );
     }
-  };
-
-  const fetchBlogs = async () => {
-    const blogs = (await BlogService.getAll()).data;
-    setBlogs(
-      blogs.sort( (a,b) => a.likes === b.likes ? 0 : (a.likes > b.likes ? -1 : 1 ) )
-    );
   };
 
   const logout = (e) => {
@@ -71,26 +65,26 @@ const App = () => {
       resetAuthor();
       resetTitle();
       resetUrl();
-      fetchBlogs();
+      props.fetchBlogs();
 
-      setNotification({
+      props.setNotification({
         message: `New blog '${blogTitle.value}' created`,
-        type: 'success'
+        type: 'success',
+        delay: 3
       });
-      setTimeout( () => setNotification({}), 3000 );
     } catch(err) {
-      setNotification({
+      props.setNotification({
         message: 'Blog creation failed',
-        type: 'error'
+        type: 'error',
+        delay: 3
       });
-      setTimeout( () => setNotification({}), 3000 );
     }
   };
 
   const likeAction = async ( blog ) => {
     try {
       await BlogService.likeAction(blog.id, blog.likes+1);
-      fetchBlogs();
+      props.fetchBlogs();
     } catch(err) {
       console.log(err);
     }
@@ -100,7 +94,7 @@ const App = () => {
     try {
       if(window.confirm('Do you want to remove blog?')) {
         await BlogService.remove(blog.id);
-        fetchBlogs();
+        props.fetchBlogs();
       }
     } catch(err) {
       console.log(err);
@@ -115,13 +109,13 @@ const App = () => {
       BlogService.setToken(usrData.token);
     }
 
-    fetchBlogs();
+    props.fetchBlogs();
   }, []);
 
   if(!user) {
     return (
       <div>
-        <Notification notification={notification}/>
+        <Notification/>
         <h1>Login to application</h1>
         <Login
           username={username} password={password}
@@ -132,12 +126,12 @@ const App = () => {
 
   return (
     <div>
-      <Notification  notification={notification}/>
+      <Notification/>
       <h1>blogs</h1>
       { user.name } logged in.<br/>
       <button onClick={ logout }>Logout</button><br/>
       <br/>
-      { blogs.map(blog =>
+      { props.blogs.map(blog =>
         <Blog key={blog.id} blog={blog} likeAction={likeAction} removeAction={removeAction} user={user}/>
       ) }
       <br/>
@@ -151,4 +145,12 @@ const App = () => {
   );
 };
 
-export default App;
+const mapStateToProps = (state) => {
+  return {
+    blogs: state.blogs,
+  };
+};
+
+export default connect(
+  mapStateToProps, { setNotification, fetchBlogs }
+)(App);

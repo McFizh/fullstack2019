@@ -1,5 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import { connect } from 'react-redux';
 
 import './Notification.css';
 
@@ -21,4 +22,10 @@ Notification.propTypes = {
   notification: PropTypes.object.isRequired
 };
 
-export default Notification;
+const mapStateToProps = (state) => {
+  return {
+    notification: state.notification,
+  };
+};
+
+export default connect(mapStateToProps)(Notification);
