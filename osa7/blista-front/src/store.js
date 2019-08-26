@@ -5,12 +5,14 @@ import rootSaga from './rootSaga';
 
 import blogReducer from './reducers/blogReducer';
 import notificationReducer from './reducers/notificationReducer';
+import userReducer from './reducers/userReducer';
 
 const sagaMiddleware = createSagaMiddleware();
 
 const reducer = combineReducers({
   blogs: blogReducer,
-  notification: notificationReducer
+  notification: notificationReducer,
+  user: userReducer
 });
 
 const store = createStore(reducer, applyMiddleware(sagaMiddleware));

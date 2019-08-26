@@ -1,6 +1,6 @@
-import React, { useState,useImperativeHandle } from 'react';
+import React, { useState, forwardRef, useImperativeHandle } from 'react';
 
-const Togglable = React.forwardRef((props, ref) => {
+const Togglable = forwardRef((props, ref) => {
   const [ visible, setVisible ] = useState(false);
 
   const toggleVisibility = () => {
