@@ -1,13 +1,15 @@
-import React, { useState } from 'react';
+import React from 'react';
 import './Blog.css';
+import { Link } from 'react-router-dom';
 
-const Blog = ({ blog, likeAction, removeAction, user }) => {
-  const [ open, setOpen ] = useState(false);
+const Blog = ({ blog }) => {
+  return (
+    <div className='blog'>
+      <span><Link to={`/blogs/${blog.id}`}>{blog.title} {blog.author}</Link></span><br/>
+    </div>
+  );
 
-  const toggleOpen = () => {
-    setOpen(!open);
-  };
-
+  /*
   const likeBlog = (e) => {
     e.preventDefault();
     likeAction(blog);
@@ -17,29 +19,16 @@ const Blog = ({ blog, likeAction, removeAction, user }) => {
     e.preventDefault();
     removeAction(blog);
   };
-
-  if(!open) {
-    return (
-      <div className='blog'>
-        <span onClick={toggleOpen}>{blog.title} {blog.author}</span>
-      </div>
-    );
-  }
-
   let removeButton = '';
   if(blog.user.username === user.username) {
     removeButton = <button onClick={removeBlog}>Remove</button>;
   }
 
-  return (
-    <div className='blog'>
-      <span onClick={toggleOpen}>{blog.title} {blog.author}</span><br/>
-      <a href={blog.url} target='_blank' rel='noreferrer noopener'>{blog.url}</a><br/>
+  <a href={blog.url} target='_blank' rel='noreferrer noopener'>{blog.url}</a><br/>
       {blog.likes} likes <button onClick={likeBlog}>Like</button><br/>
       Added by: {blog.user.name}<br/>
       {removeButton}
-    </div>
-  );
+  */
 
 };
 

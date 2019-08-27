@@ -1,36 +1,26 @@
-import React, { useRef, useEffect } from 'react';
+import React, { useEffect } from 'react';
 import  { useField } from './hooks';
 import { connect } from 'react-redux';
+import { Route } from 'react-router-dom';
 
-import Blog from './components/Blog';
 import Login from './components/Login';
-import NewBlog from './components/NewBlog';
 import Notification from './components/Notification';
 
-import BlogService from './services/blogs';
-import Togglable from './components/Togglable';
+import Userlist from './views/userlist';
+import Bloglist from './views/bloglist';
+import Userinfo from './views/userinfo';
+import Bloginfo from './views/bloginfo';
 
-import { setNotification } from './reducers/notificationReducer';
-import { createBlog, fetchBlogs } from './reducers/blogReducer';
 import { doLogin, doLogout, setUserData } from './reducers/userReducer';
 
 const App = (props) => {
-  const [ blogTitle, resetTitle ] = useField('text');
-  const [ blogAuthor, resetAuthor ] = useField('text');
-  const [ blogUrl, resetUrl ] = useField('text');
 
   const [ username, resetUsername ] = useField('text');
   const [ password, resetPassword ] = useField('password');
 
-  const blogFormRef = useRef();
-
   const resetCallbacks = {
-    resetTitle,
-    resetAuthor,
-    resetUrl,
     resetUsername,
     resetPassword,
-    hideBlogForm: () => { blogFormRef.current.toggleVisibility(); }
   };
 
   const loginEvent = (e) => {
@@ -45,36 +35,6 @@ const App = (props) => {
   const logoutEvent = (e) => {
     e.preventDefault();
     props.doLogout();
-  };
-
-  const createBlogEvent = (e) => {
-    e.preventDefault();
-    props.createBlog({
-      title: blogTitle.value,
-      author: blogAuthor.value,
-      url: blogUrl.value,
-      resetCallbacks
-    });
-  };
-
-  const likeAction = async ( blog ) => {
-    try {
-      await BlogService.likeAction(blog.id, blog.likes+1);
-      props.fetchBlogs();
-    } catch(err) {
-      console.log(err);
-    }
-  };
-
-  const removeAction = async ( blog ) => {
-    try {
-      if(window.confirm('Do you want to remove blog?')) {
-        await BlogService.remove(blog.id);
-        props.fetchBlogs();
-      }
-    } catch(err) {
-      console.log(err);
-    }
   };
 
   useEffect( () => {
@@ -96,23 +56,20 @@ const App = (props) => {
     );
   }
 
+  const getBlogById = (id) => !props.blog ? null : props.blog.find( b => b.id === id );
+  const getUserById = (id) => !props.users ? null : props.users.find( b => b.id === id );
+
   return (
     <div>
       <Notification/>
-      <h1>blogs</h1>
+      <Route exact path="/" render={ () => <Bloglist blogs={props.blogs} user={props.user}/> } />
+      <Route exact path="/blog/:id" render={ ({ match }) => <Bloginfo blog={ getBlogById(match.params.id) }/> } />
+      <Route exact path="/users" render={() => <Userlist users={props.users}/>} />
+      <Route exact path="/users/:id" render={ ({ match }) => <Userinfo user={ getUserById(match.params.id ) }/> } />
+
       { props.user.name } logged in.<br/>
       <button onClick={ logoutEvent }>Logout</button><br/>
       <br/>
-      { props.blogs.map(blog =>
-        <Blog key={blog.id} blog={blog} likeAction={likeAction} removeAction={removeAction} user={props.user}/>
-      ) }
-      <br/>
-      <Togglable buttonLabel='Create blog' ref={blogFormRef}>
-        <NewBlog
-          blogTitle={blogTitle} blogAuthor={blogAuthor} blogUrl={blogUrl}
-          createBlog={ createBlogEvent }
-        />
-      </Togglable>
     </div>
   );
 };
@@ -121,14 +78,12 @@ const mapStateToProps = (state) => {
   return {
     blogs: state.blogs,
     user: state.user,
+    users: state.users
   };
 };
 
 export default connect(
   mapStateToProps, {
-    setNotification,
-    createBlog,
-    fetchBlogs,
     doLogin,
     doLogout,
     setUserData

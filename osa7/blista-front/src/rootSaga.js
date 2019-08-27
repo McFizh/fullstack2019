@@ -1,6 +1,7 @@
 import { put, takeLatest, all, delay } from 'redux-saga/effects';
 import BlogService from './services/blogs';
 import LoginService from './services/login';
+import UsersService from './services/users';
 
 function* setNotification({ notification }) {
   yield delay(notification.delay * 1000);
@@ -15,6 +16,14 @@ function* fetchBlogs() {
   yield put({
     type: 'BLOGS_RECEIVED',
     data
+  });
+}
+
+function* fetchUsers() {
+  const usersRsp = yield UsersService.getAll();
+  yield put({
+    type: 'USERS_LOADED',
+    data: usersRsp.data
   });
 }
 
@@ -54,6 +63,7 @@ function* loginUser({ credentials }) {
     BlogService.setToken(res.data.token);
     resetCallbacks.resetUsername();
     resetCallbacks.resetPassword();
+    yield put({ type: 'FETCH_USERS' });
     yield put({ type: 'LOGIN_SUCCESS', data: res.data });
   } catch(err) {
     const notification = {
@@ -69,14 +79,13 @@ function* loginUser({ credentials }) {
 function *logoutUser() {
   window.localStorage.removeItem('appUser');
   BlogService.setToken('');
-  yield put({
-    type: 'LOGOUT_SUCCESS'
-  });
+  yield put({ type: 'LOGOUT_SUCCESS' });
 }
 
 function *storeUser({ user }) {
   BlogService.setToken(user.token);
   yield put({ type: 'FETCH_BLOGS' });
+  yield put({ type: 'FETCH_USERS' });
   yield put({ type: 'STORE_SUCCESS', user });
 }
 
@@ -88,6 +97,8 @@ function* actionWatcher() {
   yield takeLatest('STORE_USER', storeUser);
   yield takeLatest('LOGIN', loginUser);
   yield takeLatest('LOGOUT', logoutUser);
+
+  yield takeLatest('FETCH_USERS', fetchUsers);
 }
 
 export default function* rootSaga() {
