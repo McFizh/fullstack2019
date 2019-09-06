@@ -27,6 +27,25 @@ function* fetchUsers() {
   });
 }
 
+function* likeBlog({ blog }) {
+  try {
+    yield BlogService.likeAction(blog.id, blog.likes+1);
+    yield put({ type: 'FETCH_BLOGS' });
+  } catch(err) {
+    console.log(err);
+  }
+}
+
+function* removeBlog({ blog }) {
+  try {
+    yield BlogService.remove(blog.id);
+    yield put({ type: 'FETCH_BLOGS' });
+    yield put({ type: 'BLOG_REMOVED' });
+  } catch(err) {
+    console.log(err);
+  }
+}
+
 function* createBlog({ blog }) {
   const { title, author, url, resetCallbacks } = blog;
   try {
@@ -92,6 +111,8 @@ function *storeUser({ user }) {
 function* actionWatcher() {
   yield takeLatest('FETCH_BLOGS', fetchBlogs);
   yield takeLatest('CREATE_BLOG', createBlog);
+  yield takeLatest('LIKE_BLOG', likeBlog);
+  yield takeLatest('REMOVE_BLOG', removeBlog);
   yield takeLatest('SET_NOTIFICATION', setNotification);
 
   yield takeLatest('STORE_USER', storeUser);

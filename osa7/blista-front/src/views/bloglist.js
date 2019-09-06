@@ -7,7 +7,6 @@ import Togglable from '../components/Togglable';
 
 import  { useField } from '../hooks';
 
-import BlogService from '../services/blogs';
 import { createBlog, fetchBlogs } from '../reducers/blogReducer';
 
 const Bloglist = (props) => {
@@ -34,32 +33,10 @@ const Bloglist = (props) => {
     });
   };
 
-  const likeAction = async ( blog ) => {
-    try {
-      await BlogService.likeAction(blog.id, blog.likes+1);
-      props.fetchBlogs();
-    } catch(err) {
-      console.log(err);
-    }
-  };
-
-  const removeAction = async ( blog ) => {
-    try {
-      if(window.confirm('Do you want to remove blog?')) {
-        await BlogService.remove(blog.id);
-        props.fetchBlogs();
-      }
-    } catch(err) {
-      console.log(err);
-    }
-  };
-
   return (
     <div>
       <h1>blogs</h1>
-      { props.blogs.map(blog =>
-        <Blog key={blog.id} blog={blog} likeAction={likeAction} removeAction={removeAction} user={props.user}/>
-      ) }
+      { props.blogs.map( blog => <Blog key={blog.id} blog={blog}/> ) }
       <br/>
       <Togglable buttonLabel='Create blog' ref={blogFormRef}>
         <NewBlog

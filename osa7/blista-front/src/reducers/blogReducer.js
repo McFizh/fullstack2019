@@ -7,6 +7,16 @@ export const createBlog = (blog) => ({
   blog
 });
 
+export const likeBlog = (blog) => ({
+  type: 'LIKE_BLOG',
+  blog
+});
+
+export const removeBlog = (blog) => ({
+  type: 'REMOVE_BLOG',
+  blog
+});
+
 const reducer = (state = [], action) => {
   switch(action.type) {
     case 'BLOGS_RECEIVED':

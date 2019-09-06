@@ -5,6 +5,7 @@ import { Route } from 'react-router-dom';
 
 import Login from './components/Login';
 import Notification from './components/Notification';
+import Header from './components/Header';
 
 import Userlist from './views/userlist';
 import Bloglist from './views/bloglist';
@@ -56,14 +57,15 @@ const App = (props) => {
     );
   }
 
-  const getBlogById = (id) => !props.blog ? null : props.blog.find( b => b.id === id );
+  const getBlogById = (id) => !props.blogs ? null : props.blogs.find( b => b.id === id );
   const getUserById = (id) => !props.users ? null : props.users.find( b => b.id === id );
 
   return (
     <div>
+      <Header/>
       <Notification/>
-      <Route exact path="/" render={ () => <Bloglist blogs={props.blogs} user={props.user}/> } />
-      <Route exact path="/blog/:id" render={ ({ match }) => <Bloginfo blog={ getBlogById(match.params.id) }/> } />
+      <Route exact path="/" render={ () => <Bloglist blogs={props.blogs}/> } />
+      <Route exact path="/blogs/:id" render={ ({ match }) => <Bloginfo blog={ getBlogById(match.params.id) } user={props.user}/> } />
       <Route exact path="/users" render={() => <Userlist users={props.users}/>} />
       <Route exact path="/users/:id" render={ ({ match }) => <Userinfo user={ getUserById(match.params.id ) }/> } />
 
