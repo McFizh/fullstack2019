@@ -1,1 +1,29 @@
 @import '~react-bulma-components/src/index.sass';
+
+.loginSection {
+  height: 100vh;
+  padding: 0;
+  display: flex;
+  flex-wrap: nowrap;
+  justify-content: center;
+  align-items: center;
+  margin-top: -20px;
+
+  .titleContainer {
+    max-width: 350px;
+
+    .title {
+      text-align: center;
+      margin-bottom: 1em;
+      font-size: 20pt;
+      font-weight: bold;
+    }
+  }
+
+  .fieldContainer {
+    padding: 20px;
+    box-shadow: 0px 0px 3px 0px rgba(0,0,0,0.75);
+    border-radius: 5px;
+    border: 1px solid #bbb;
+  }
+}

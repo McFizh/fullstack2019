@@ -49,7 +49,6 @@ const App = (props) => {
     return (
       <div>
         <Notification/>
-        <h1>Login to application</h1>
         <Login
           username={username} password={password}
           tryLogin={ loginEvent }/>
