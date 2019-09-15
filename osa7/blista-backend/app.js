@@ -9,7 +9,12 @@ const LoginRouter = require('./controllers/login');
 const Config = require('./utils/config');
 const Middleware = require('./utils/middleware');
 
-mongoose.connect(Config.DB_URL, { useNewUrlParser: true });
+mongoose.connect(Config.DB_URL, {
+  useNewUrlParser: true,
+  useCreateIndex: true,
+  useFindAndModify: false
+});
+
 
 app.use(Cors());
 app.use(BodyParser.json());

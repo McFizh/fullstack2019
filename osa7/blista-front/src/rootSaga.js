@@ -46,6 +46,16 @@ function* removeBlog({ blog }) {
   }
 }
 
+function* commentBlog({ blog, comment }) {
+  try {
+    yield BlogService.comment(blog.id, comment);
+    yield put({ type: 'FETCH_BLOGS' });
+    yield put({ type: 'BLOG_COMMENT_ADDED' });
+  } catch(err) {
+    console.log(err);
+  }
+}
+
 function* createBlog({ blog }) {
   const { title, author, url, resetCallbacks } = blog;
   try {
@@ -57,7 +67,7 @@ function* createBlog({ blog }) {
     resetCallbacks.hideBlogForm();
 
     const notification = {
-      message: `New blog '${title.value}' created`,
+      message: `New blog '${title}' created`,
       type: 'success',
       delay: 3
     };
@@ -112,6 +122,7 @@ function* actionWatcher() {
   yield takeLatest('FETCH_BLOGS', fetchBlogs);
   yield takeLatest('CREATE_BLOG', createBlog);
   yield takeLatest('LIKE_BLOG', likeBlog);
+  yield takeLatest('COMMENT_BLOG', commentBlog);
   yield takeLatest('REMOVE_BLOG', removeBlog);
   yield takeLatest('SET_NOTIFICATION', setNotification);
 

@@ -17,6 +17,12 @@ export const removeBlog = (blog) => ({
   blog
 });
 
+export const commentBlog = (blog, comment) => ({
+  type: 'COMMENT_BLOG',
+  blog,
+  comment
+});
+
 const reducer = (state = [], action) => {
   switch(action.type) {
     case 'BLOGS_RECEIVED':

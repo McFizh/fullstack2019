@@ -4,8 +4,7 @@ import Button from 'react-bulma-components/lib/components/button';
 import Section from 'react-bulma-components/lib/components/section';
 
 import {
-  Field, Control,
-  Label, Input
+  Field, Control, Label, Input
 } from 'react-bulma-components/lib/components/form';
 
 const Login = ({ username, password, tryLogin }) => {

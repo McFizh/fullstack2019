@@ -85,4 +85,21 @@ blogsRouter.put('/:id', async (request, response, next) => {
   }
 });
 
+blogsRouter.post('/:id/comments', async (request, response, next) => {
+  try {
+    const comment = request.body.comment;
+    const blog = await Blog.findOneAndUpdate({ _id: request.params.id }, {
+      $push: { comments: comment }
+    }, {
+      new: true
+    });
+    if(!blog) {
+      return response.status(404).json({ error: 'blog not found' });
+    }
+    response.json(blog);
+  } catch(err) {
+    next(err);
+  }
+});
+
 module.exports = blogsRouter;

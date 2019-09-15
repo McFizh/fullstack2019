@@ -12,7 +12,9 @@ import Bloglist from './views/bloglist';
 import Userinfo from './views/userinfo';
 import Bloginfo from './views/bloginfo';
 
-import { doLogin, doLogout, setUserData } from './reducers/userReducer';
+import Container from 'react-bulma-components/lib/components/container';
+
+import { doLogin, setUserData } from './reducers/userReducer';
 
 const App = (props) => {
 
@@ -31,11 +33,6 @@ const App = (props) => {
       password: password.value,
       resetCallbacks
     });
-  };
-
-  const logoutEvent = (e) => {
-    e.preventDefault();
-    props.doLogout();
   };
 
   useEffect( () => {
@@ -62,15 +59,13 @@ const App = (props) => {
   return (
     <div>
       <Header/>
-      <Notification/>
-      <Route exact path="/" render={ () => <Bloglist blogs={props.blogs}/> } />
-      <Route exact path="/blogs/:id" render={ ({ match }) => <Bloginfo blog={ getBlogById(match.params.id) } user={props.user}/> } />
-      <Route exact path="/users" render={() => <Userlist users={props.users}/>} />
-      <Route exact path="/users/:id" render={ ({ match }) => <Userinfo user={ getUserById(match.params.id ) }/> } />
-
-      { props.user.name } logged in.<br/>
-      <button onClick={ logoutEvent }>Logout</button><br/>
-      <br/>
+      <Container>
+        <Notification/>
+        <Route exact path="/" render={ () => <Bloglist blogs={props.blogs}/> } />
+        <Route exact path="/blogs/:id" render={ ({ match }) => <Bloginfo blog={ getBlogById(match.params.id) } user={props.user}/> } />
+        <Route exact path="/users" render={() => <Userlist users={props.users}/>} />
+        <Route exact path="/users/:id" render={ ({ match }) => <Userinfo user={ getUserById(match.params.id ) }/> } />
+      </Container>
     </div>
   );
 };
@@ -86,7 +81,6 @@ const mapStateToProps = (state) => {
 export default connect(
   mapStateToProps, {
     doLogin,
-    doLogout,
     setUserData
   }
 )(App);

@@ -21,6 +21,11 @@ const likeAction = (id, likes) => {
   return axios.put(`${baseUrl}/${id}`, { likes }, config);
 };
 
+const comment = (id, comment) => {
+  const config = { headers: { Authorization: token } };
+  return axios.post(`${baseUrl}/${id}/comments`, { comment }, config);
+};
+
 const remove = (id) => {
   const config = { headers: { Authorization: token } };
   return axios.delete(`${baseUrl}/${id}`, config);
@@ -28,6 +33,7 @@ const remove = (id) => {
 
 export default {
   createBlog,
+  comment,
   getAll,
   setToken,
   likeAction,

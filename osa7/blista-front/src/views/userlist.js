@@ -2,6 +2,8 @@ import React from 'react';
 
 import { Link } from 'react-router-dom';
 
+import Heading from 'react-bulma-components/lib/components/heading';
+
 const Userlist = ({ users }) => {
   if(users === null) {
     return null;
@@ -9,7 +11,7 @@ const Userlist = ({ users }) => {
 
   return (
     <div>
-      <h1>Users</h1>
+      <Heading>List of users</Heading>
       { users.map( user => <div key={user.id}>
         <Link to={`/users/${user.id}`}>
           {user.name}
