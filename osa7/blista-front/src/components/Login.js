@@ -19,14 +19,14 @@ const Login = ({ username, password, tryLogin }) => {
           <Field>
             <Label>Username:</Label>
             <Control>
-              <Input { ...username }/>
+              <Input id="username" { ...username }/>
             </Control>
           </Field>
 
           <Field>
             <Label>Password:</Label>
             <Control>
-              <Input {...password}/>
+              <Input id="password" {...password}/>
             </Control>
           </Field>
 

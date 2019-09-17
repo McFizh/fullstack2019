@@ -40,6 +40,7 @@ const App = (props) => {
     if(appUser) {
       props.setUserData(JSON.parse(appUser));
     }
+    // eslint-disable-next-line
   }, []);
 
   if(!props.user) {

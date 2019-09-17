@@ -49,6 +49,7 @@ const config = {
   devServer: {
     contentBase: path.resolve(__dirname, 'build'),
     compress: true,
+    historyApiFallback: true,
     proxy: {
       '/api': 'http://localhost:3003'
     },
