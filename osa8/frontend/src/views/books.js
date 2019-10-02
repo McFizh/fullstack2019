@@ -6,7 +6,6 @@ const BooksView = ({ books }) => {
     return <div>Loading...</div>
   }
 
-
   return <div>
     <h1>Books</h1>
     <table>
@@ -18,7 +17,7 @@ const BooksView = ({ books }) => {
       <tbody>
         { books.data.allBooks.map( (book) => <tr key={book.title}>
           <td>{book.title}</td>
-          <td>{book.author}</td>
+          <td>{book.author.name}</td>
           <td>{book.published}</td>
         </tr> ) }
       </tbody>
