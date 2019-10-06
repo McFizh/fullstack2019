@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 
 import { BrowserRouter as Router, Route } from 'react-router-dom';
 import { gql } from 'apollo-boost';
@@ -7,8 +7,10 @@ import { useQuery, useMutation } from '@apollo/react-hooks';
 import BooksView from './views/books';
 import AuthorsView from './views/authors';
 import AddBookView from './views/addbook';
+import LoginView from './views/login';
 
 import Header from './components/header';
+import Notification from './components/notification';
 
 const ALL_AUTHORS = gql`
   {
@@ -26,6 +28,7 @@ const ALL_BOOKS = gql`
       title
       published
       author { name }
+      genres
     }
   }
 `;
@@ -54,9 +57,24 @@ mutation editAuthor($name: String!, $born: Int!) {
 }
 `;
 
+const LOGIN = gql`
+mutation login($username: String!, $password: String!) {
+  login(
+    username: $username
+    password: $password
+  ) {
+    value
+  }
+}
+`;
+
+
 function App() {
   const authors = useQuery(ALL_AUTHORS);
   const books = useQuery(ALL_BOOKS);
+
+  const [ authToken, setAuthToken ] = useState('');
+  const [ message, setMessage ] = useState('');
 
   const [ addBook ] = useMutation(CREATE_BOOK, {
     refetchQueries: [ { query: ALL_AUTHORS }, { query: ALL_BOOKS } ]
@@ -66,12 +84,30 @@ function App() {
     refetchQueries: [ { query: ALL_AUTHORS } ]
   });
 
+  const [ login ] = useMutation(LOGIN);
+
+  const loginAction = async (username, password) => {
+    try {
+      const result = await login({
+        variables: {
+          username,
+          password
+        }
+      });
+      setAuthToken(result.data.login.value);
+    } catch(err) {
+      setMessage('Login failed');
+    }
+  }
+
   return (
     <Router>
-      <Header/>
+      <Header authToken={authToken} setAuthToken={setAuthToken}/>
+      <Notification message={message}/>
       <Route exact path="/" render={ () => <BooksView books={books}/> }/>
-      <Route path="/authors" render={ () => <AuthorsView authors={authors} editAuthor={editAuthor}/> }/>
+      <Route path="/authors" render={ () => <AuthorsView authors={authors} editAuthor={editAuthor} authToken={authToken}/> }/>
       <Route path="/addbook" render={ () => <AddBookView addBook={addBook}/> }/>
+      <Route path="/login" render={ () => <LoginView login={loginAction} setMessage={setMessage}/> }/>
     </Router>
   );
 }

@@ -5,7 +5,7 @@ import Select from 'react-select';
 import { useField } from '../hooks';
 
 
-const AuthorsView = ({ authors, editAuthor }) => {
+const AuthorsView = ({ authors, editAuthor, authToken }) => {
   const [ selectedAuthor, setSelectedAuthor ] = useState(null);
   const [ year, resetYear ] = useField('text');
 
@@ -33,6 +33,16 @@ const AuthorsView = ({ authors, editAuthor }) => {
     resetYear();
   }
 
+  const editAuthorComponent = authToken === '' ? null : <div>
+    <h1>Set birthyear</h1>
+    <div>
+      <Select options={authorOptions} value={selectedAuthor} onChange={authorChanged}/>
+      <label>Born</label>
+      <input {...year}/><br/>
+      <button type="button" onClick={changeYear}>Update author</button>
+    </div>
+  </div>;
+
   return <div>
     <h1>Authors</h1>
     <table>
@@ -49,13 +59,7 @@ const AuthorsView = ({ authors, editAuthor }) => {
         </tr> ) }
       </tbody>
     </table>
-    <h1>Set birthyear</h1>
-    <div>
-      <Select options={authorOptions} value={selectedAuthor} onChange={authorChanged}/>
-      <label>Born</label>
-      <input {...year}/><br/>
-      <button type="button" onClick={changeYear}>Update author</button>
-    </div>
+    {editAuthorComponent}
   </div>;
 }
 

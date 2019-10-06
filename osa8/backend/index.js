@@ -1,9 +1,17 @@
-const { ApolloServer, UserInputError, gql } = require('apollo-server');
+const {
+  ApolloServer, UserInputError, AuthenticationError, gql
+} = require('apollo-server');
+const jwt = require('jsonwebtoken');
+const Mongoose = require('mongoose');
+
 require('dotenv').config();
 
-const Mongoose = require('mongoose');
 const AuthorModel = require('./models/author');
 const BookModel = require('./models/book');
+const UserModel = require('./models/user');
+
+//
+const JWT_TOKEN = process.env.SECRET;
 
 //
 if(!process.env.DB_URL) {
@@ -106,6 +114,9 @@ const resolvers = {
     },
     allAuthors: () => {
       return AuthorModel.find();
+    },
+    me: (root, args, { currentUser }) => {
+      return currentUser;
     }
   },
 
@@ -117,7 +128,11 @@ const resolvers = {
   },
 
   Mutation: {
-    addBook: async (root, args) => {
+    addBook: async (root, args, { currentUser }) => {
+      if (!currentUser) {
+        throw new AuthenticationError('not authenticated');
+      }
+
       try {
         let author = await AuthorModel.findOne({ name: args.author });
         if(!author) {
@@ -133,7 +148,11 @@ const resolvers = {
         });
       }
     },
-    editAuthor: async (root, args) => {
+    editAuthor: async (root, args, { currentUser }) => {
+      if (!currentUser) {
+        throw new AuthenticationError('not authenticated');
+      }
+
       try {
         const author = await AuthorModel.findOne({ name: args.name });
         if(!author) { return null; }
@@ -143,6 +162,27 @@ const resolvers = {
       } catch(err) {
         console.log(err);
       }
+    },
+    createUser: async (root, args) => {
+      try {
+        const user = new UserModel({
+          username: args.username,
+          favoriteGenre: args.favoriteGenre
+        });
+        return await user.save();
+      } catch(err) {
+        throw new UserInputError(err.message, {
+          invalidArgs: args,
+        });
+      }
+    },
+    login: async (root, args) => {
+      const user = UserModel.findOne({ username: args.username });
+      if(!user || args.password !== 'password') {
+        throw new UserInputError('wrong credentials');
+      }
+      const UserToken = { id: user._id, username: user.username };
+      return { value: jwt.sign(UserToken, JWT_TOKEN) };
     }
   }
 };
@@ -150,6 +190,16 @@ const resolvers = {
 const server = new ApolloServer({
   typeDefs,
   resolvers,
+
+  context: async ({ req }) => {
+    const auth = req ? req.headers.authorization : null;
+    if (auth && auth.toLowerCase().startsWith('bearer ')) {
+      const decodedToken = jwt.verify( auth.substring(7), JWT_TOKEN );
+      const currentUser = await UserModel.findById(decodedToken.id);
+      return { currentUser };
+    }
+  }
+
 });
 
 server.listen().then(({ url }) => {
