@@ -1,3 +1,30 @@
 body {
   margin: 10;
 }
+
+.login label {
+  display: block;
+  margin-top: 10px;
+  font-weight: bold;
+}
+
+.message {
+  border: 1px solid red;
+  padding: 10px;
+}
+
+.genreSelector {
+  margin-right: 15px;
+  border: 1px solid #ccc;
+  padding: 5px;
+  display: inline-block;
+}
+
+.genreSelector .selected {
+  background-color: #00ff0f;
+}
+
+.genreSelector:hover {
+  background-color: #aaa;
+  cursor: pointer;
+}
