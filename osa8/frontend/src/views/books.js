@@ -1,17 +1,15 @@
 import React from 'react';
 
-const BooksView = ({ books }) => {
-  if(books.loading) {
+const BooksView = ({ books, genres, selectedGenre, setGenre }) => {
+  if(books.loading || genres.loading) {
     return <div>Loading...</div>
   }
 
-  const tGenres = books.data.allBooks
-    .map( (book) => book.genres)
-    .flat();
-  const genres = tGenres.filter( (item, index) => tGenres.indexOf(item) === index );
+  const genreText = selectedGenre === '' ? null : <p>in genre {selectedGenre}</p>;
 
   return <div>
     <h1>Books</h1>
+    {genreText}
     <table>
       <thead><tr>
         <td></td>
@@ -27,7 +25,13 @@ const BooksView = ({ books }) => {
       </tbody>
     </table>
     <br/>
-    { genres.map( (genre) => <div key={genre} className="genreSelector">{genre}</div> ) }
+    { genres.data.allGenres.map( (genre) =>
+      <div
+        key={genre}
+        className={ genre === selectedGenre ? "genreSelector selected":"genreSelector"}
+        onClick={ (e) => setGenre(e,genre) }
+        >{genre}</div>
+    ) }
   </div>;
 }
 

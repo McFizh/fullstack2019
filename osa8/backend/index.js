@@ -61,6 +61,7 @@ const typeDefs = gql`
     authorCount: Int!
     allBooks(author: String, genre: String): [Book!]
     allAuthors: [Author!]!
+    allGenres: [String!]!
     me: User
   }
 
@@ -114,6 +115,12 @@ const resolvers = {
     },
     allAuthors: () => {
       return AuthorModel.find();
+    },
+    allGenres: async () => {
+      let books = await BookModel.find();
+      let genres = books.map( book => book.genres ).flat();
+      genres = genres.filter( (item,idx) => genres.indexOf(item) === idx );
+      return genres;
     },
     me: (root, args, { currentUser }) => {
       return currentUser;
@@ -177,7 +184,7 @@ const resolvers = {
       }
     },
     login: async (root, args) => {
-      const user = UserModel.findOne({ username: args.username });
+      const user = await UserModel.findOne({ username: args.username });
       if(!user || args.password !== 'password') {
         throw new UserInputError('wrong credentials');
       }
