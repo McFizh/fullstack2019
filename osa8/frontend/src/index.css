@@ -18,13 +18,14 @@ body {
   border: 1px solid #ccc;
   padding: 5px;
   display: inline-block;
+  user-select: none;
 }
 
-.genreSelector .selected {
+.genreSelector.selected {
   background-color: #00ff0f;
 }
 
 .genreSelector:hover {
-  background-color: #aaa;
   cursor: pointer;
+  border: 2px solid black;
 }
