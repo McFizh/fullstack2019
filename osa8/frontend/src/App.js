@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 
 import { BrowserRouter as Router, Route } from 'react-router-dom';
-import { gql } from 'apollo-boost';
 import { useQuery, useMutation } from '@apollo/react-hooks';
 
 import BooksView from './views/books';
@@ -10,84 +9,33 @@ import AddBookView from './views/addbook';
 import LoginView from './views/login';
 import Recommendations from './views/recommendations';
 
+import client from './ApolloClient';
+
 import Header from './components/header';
 import Notification from './components/notification';
 
-const ALL_AUTHORS = gql`
-  {
-    allAuthors  {
-      name
-      born
-      bookCount
-    }
-  }
-`;
-
-const ALL_BOOKS = gql`
-  {
-    allBooks  {
-      title
-      published
-      author { name }
-      genres
-    }
-  }
-`;
-
-const ALL_GENRES = gql`{ allGenres }`;
-
-const ME = gql`{ me { favoriteGenre } }`;
-
-const CREATE_BOOK = gql`
-mutation createBook($title: String!, $author: String!, $published: Int!, $genres: [String!]) {
-  addBook(
-    title: $title,
-    published: $published,
-    author: $author,
-    genres: $genres
-  ) {
-    title
-  }
-}
-`;
-
-const EDIT_AUTHOR = gql`
-mutation editAuthor($name: String!, $born: Int!) {
-  editAuthor(
-    name: $name
-    setBornTo: $born
-  ) {
-    name
-  }
-}
-`;
-
-const LOGIN = gql`
-mutation login($username: String!, $password: String!) {
-  login(
-    username: $username
-    password: $password
-  ) {
-    value
-  }
-}
-`;
-
+import {
+  ALL_AUTHORS, ALL_GENRES, CREATE_BOOK, ME, EDIT_AUTHOR, GET_ALL_BOOKS, LOGIN
+} from './graphql/queries';
 
 function App() {
-  const authors = useQuery(ALL_AUTHORS);
-  const books = useQuery(ALL_BOOKS);
-  const genres = useQuery(ALL_GENRES);
-  const profile = useQuery(ME);
-
   const [ authToken, setAuthToken ] = useState('');
   const [ message, setMessage ] = useState('');
   const [ selectedGenre, setSelectedGenre ] = useState('');
+  const [ books, setBooks ] = useState([]);
+  const [ recBooks, setRecBooks ] = useState([]);
+
+  const authors = useQuery(ALL_AUTHORS);
+  const genres = useQuery(ALL_GENRES);
+  const profile = useQuery(ME);
 
   const [ addBook ] = useMutation(CREATE_BOOK, {
     refetchQueries: [
-      { query: ALL_AUTHORS }, { query: ALL_BOOKS }, { query: ALL_GENRES }
-    ]
+      { query: ALL_AUTHORS }, { query: ALL_GENRES }
+    ],
+    update: () => {
+      getBooks(false, selectedGenre);
+    }
   });
 
   const [ editAuthor ] = useMutation(EDIT_AUTHOR, {
@@ -96,12 +44,26 @@ function App() {
 
   const [ login ] = useMutation(LOGIN);
 
+  const getBooks = async (useCache = true, genre) => {
+    const { data } = await client.query({
+      query: GET_ALL_BOOKS,
+      variables: { genre },
+      fetchPolicy: useCache ? 'cache-first' : 'no-cache'
+    });
+    setBooks(data.allBooks);
+  }
+
   useEffect( () => {
     const token = localStorage.getItem('user-token');
+
     if(token && token !== '') {
       setAuthToken(token);
     }
   }, []);
+
+  useEffect( () => {
+    getBooks(true, selectedGenre);
+  }, [selectedGenre])
 
   const setGenre = (e, genre) => {
     e.preventDefault();
@@ -131,7 +93,7 @@ function App() {
       <Notification message={message}/>
       <Route exact path="/" render={ () => <BooksView books={books} genres={genres} setGenre={setGenre} selectedGenre={selectedGenre} /> }/>
       <Route path="/authors" render={ () => <AuthorsView authors={authors} editAuthor={editAuthor} authToken={authToken}/> }/>
-      <Route path="/recommendations" render={ () => <Recommendations profile={profile} genres={genres}/> }/>
+      <Route path="/recommendations" render={ () => <Recommendations profile={profile} genres={genres} books={recBooks}/> }/>
       <Route path="/addbook" render={ () => <AddBookView addBook={addBook}/> }/>
       <Route path="/login" render={ () => <LoginView login={loginAction} setMessage={setMessage}/> }/>
     </Router>

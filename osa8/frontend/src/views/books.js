@@ -1,7 +1,7 @@
 import React from 'react';
 
 const BooksView = ({ books, genres, selectedGenre, setGenre }) => {
-  if(books.loading || genres.loading) {
+  if(genres.loading) {
     return <div>Loading...</div>
   }
 
@@ -17,7 +17,7 @@ const BooksView = ({ books, genres, selectedGenre, setGenre }) => {
         <td>Published</td>
         </tr></thead>
       <tbody>
-        { books.data.allBooks.map( (book) => <tr key={book.title}>
+        { books.map( (book) => <tr key={book.title}>
           <td>{book.title}</td>
           <td>{book.author.name}</td>
           <td>{book.published}</td>

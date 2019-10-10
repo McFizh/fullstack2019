@@ -106,7 +106,7 @@ const resolvers = {
       }
 
       if(args.genre) {
-        findObj['genre'] = args.genre;
+        findObj['genres'] = args.genre;
       }
 
       return BookModel
