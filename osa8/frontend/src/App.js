@@ -1,7 +1,9 @@
 import React, { useState, useEffect } from 'react';
 
 import { BrowserRouter as Router, Route } from 'react-router-dom';
-import { useQuery, useMutation } from '@apollo/react-hooks';
+import {
+  useQuery, useMutation, useSubscription, useApolloClient
+} from '@apollo/react-hooks';
 
 import BooksView from './views/books';
 import AuthorsView from './views/authors';
@@ -9,13 +11,12 @@ import AddBookView from './views/addbook';
 import LoginView from './views/login';
 import Recommendations from './views/recommendations';
 
-import client from './ApolloClient';
-
 import Header from './components/header';
 import Notification from './components/notification';
 
 import {
-  ALL_AUTHORS, ALL_GENRES, CREATE_BOOK, ME, EDIT_AUTHOR, GET_ALL_BOOKS, LOGIN
+  ALL_AUTHORS, ALL_GENRES, CREATE_BOOK, ME, EDIT_AUTHOR,
+  GET_ALL_BOOKS, BOOK_ADDED
 } from './graphql/queries';
 
 function App() {
@@ -24,6 +25,7 @@ function App() {
   const [ selectedGenre, setSelectedGenre ] = useState('');
   const [ books, setBooks ] = useState([]);
   const [ recBooks, setRecBooks ] = useState([]);
+  const client = useApolloClient();
 
   const authors = useQuery(ALL_AUTHORS);
   const genres = useQuery(ALL_GENRES);
@@ -42,7 +44,11 @@ function App() {
     refetchQueries: [ { query: ALL_AUTHORS } ]
   });
 
-  const [ login ] = useMutation(LOGIN);
+  useSubscription(BOOK_ADDED, {
+    onSubscriptionData: ({ subscriptionData }) => {
+      console.log(subscriptionData);
+    }
+  });
 
   const getBooks = async (useCache = true, genre) => {
     const { data } = await client.query({
@@ -70,23 +76,6 @@ function App() {
     setSelectedGenre(genre === selectedGenre ? '' : genre);
   }
 
-  const loginAction = async (username, password) => {
-    try {
-      const result = await login({
-        variables: {
-          username,
-          password
-        }
-      });
-      const token = result.data.login.value;
-
-      setAuthToken(token);
-      localStorage.setItem('user-token', token);
-    } catch(err) {
-      setMessage('Login failed');
-    }
-  }
-
   return (
     <Router>
       <Header authToken={authToken} setAuthToken={setAuthToken}/>
@@ -95,7 +84,7 @@ function App() {
       <Route path="/authors" render={ () => <AuthorsView authors={authors} editAuthor={editAuthor} authToken={authToken}/> }/>
       <Route path="/recommendations" render={ () => <Recommendations profile={profile} genres={genres} books={recBooks}/> }/>
       <Route path="/addbook" render={ () => <AddBookView addBook={addBook}/> }/>
-      <Route path="/login" render={ () => <LoginView login={loginAction} setMessage={setMessage}/> }/>
+      <Route path="/login" render={ () => <LoginView setAuthToken={setAuthToken} setMessage={setMessage}/> }/>
     </Router>
   );
 }

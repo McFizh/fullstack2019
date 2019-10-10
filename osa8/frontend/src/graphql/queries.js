@@ -10,6 +10,17 @@ export const ALL_AUTHORS = gql`
   }
 `;
 
+export const BOOK_ADDED = gql`
+  subscription {
+    bookAdded {
+      title
+      published
+      author { name }
+      genres
+    }
+  }
+`;
+
 export const GET_ALL_BOOKS = gql`
   query getAllBooks($genre: String)
   {
