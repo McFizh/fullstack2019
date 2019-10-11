@@ -1,11 +1,16 @@
 import React from 'react';
 
-const BooksView = ({ books, genres, selectedGenre, setGenre }) => {
-  if(books.loading || genres.loading) {
+const BooksView = ({ books, genres, selectedGenre, setSelectedGenre }) => {
+  if(genres.loading) {
     return <div>Loading...</div>
   }
 
   const genreText = selectedGenre === '' ? null : <p>in genre {selectedGenre}</p>;
+
+  const setGenre = (e, genre) => {
+    e.preventDefault();
+    setSelectedGenre(genre === selectedGenre ? '' : genre);
+  };
 
   return <div>
     <h1>Books</h1>
@@ -17,7 +22,7 @@ const BooksView = ({ books, genres, selectedGenre, setGenre }) => {
         <td>Published</td>
         </tr></thead>
       <tbody>
-        { books.data.allBooks.map( (book) => <tr key={book.title}>
+        { books.map( (book) => <tr key={book.title}>
           <td>{book.title}</td>
           <td>{book.author.name}</td>
           <td>{book.published}</td>
