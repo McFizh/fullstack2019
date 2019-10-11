@@ -1,11 +1,16 @@
 import React from 'react';
 
-const BooksView = ({ books, genres, selectedGenre, setGenre }) => {
+const BooksView = ({ books, genres, selectedGenre, setSelectedGenre }) => {
   if(genres.loading) {
     return <div>Loading...</div>
   }
 
   const genreText = selectedGenre === '' ? null : <p>in genre {selectedGenre}</p>;
+
+  const setGenre = (e, genre) => {
+    e.preventDefault();
+    setSelectedGenre(genre === selectedGenre ? '' : genre);
+  };
 
   return <div>
     <h1>Books</h1>

@@ -75,6 +75,10 @@ const typeDefs = gql`
       genres: [String]
     ): Book
 
+    changeGenre(
+      favoriteGenre: String!
+    ): String
+
     editAuthor(
       name: String
       setBornTo: Int!
@@ -191,6 +195,15 @@ const resolvers = {
           invalidArgs: args,
         });
       }
+    },
+    changeGenre: async (root, args, { currentUser }) => {
+      if (!currentUser) {
+        throw new AuthenticationError('not authenticated');
+      }
+
+      currentUser.favoriteGenre = args.favoriteGenre;
+      await currentUser.save();
+      return args.favoriteGenre;
     },
     login: async (root, args) => {
       const user = await UserModel.findOne({ username: args.username });

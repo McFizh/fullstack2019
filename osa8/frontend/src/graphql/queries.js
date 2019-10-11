@@ -15,7 +15,6 @@ export const BOOK_ADDED = gql`
     bookAdded {
       title
       published
-      author { name }
       genres
     }
   }
@@ -60,6 +59,15 @@ mutation editAuthor($name: String!, $born: Int!) {
   }
 }
 `;
+
+export const CHANGE_GENRE = gql`
+mutation changeGenre($favoriteGenre: String!) {
+  changeGenre(
+    favoriteGenre: $favoriteGenre
+  )
+}
+`;
+
 
 export const LOGIN = gql`
 mutation login($username: String!, $password: String!) {

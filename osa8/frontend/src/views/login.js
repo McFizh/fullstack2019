@@ -4,7 +4,7 @@ import { useMutation } from '@apollo/react-hooks';
 import { LOGIN } from '../graphql/queries';
 import { useField } from '../hooks';
 
-const LoginView = ({ setAuthToken, setMessage }) => {
+const LoginView = ({ setAuthToken, setMessage, profile }) => {
   const [ username, resetUsername ] = useField('text');
   const [ password, resetPassword ] = useField('password');
   const [ login ] = useMutation(LOGIN);
@@ -21,6 +21,7 @@ const LoginView = ({ setAuthToken, setMessage }) => {
 
       setAuthToken(token);
       localStorage.setItem('user-token', token);
+      profile.refetch();
     } catch(err) {
       setMessage('Login failed');
     }
