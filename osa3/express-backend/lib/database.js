@@ -3,7 +3,11 @@ const Person = require('../models/person');
 
 function connect(dbUrl) {
   Mongoose
-    .connect(dbUrl, { useNewUrlParser: true })
+    .connect(dbUrl, {
+      useNewUrlParser: true,
+      useUnifiedTopology: true,
+      useCreateIndex: true
+    })
     .then(() => {
       console.log('>> Connected to MongoDB');
     })

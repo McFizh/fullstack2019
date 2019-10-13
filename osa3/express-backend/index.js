@@ -10,7 +10,7 @@ require('dotenv').config();
 
 // Luodaan yhteys tietokantaan
 const dburl = process.env.DB_URL;
-const PORT = process.env.PORT;
+const PORT = process.env.PORT || 3001;
 
 if(!dburl) {
   console.log('Missing database url, please set it in .env file');

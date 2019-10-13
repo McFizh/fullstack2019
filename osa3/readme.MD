@@ -1,15 +1,10 @@
-Assignment 3.12 file (mongo.js) is in backend directory. Rest of the application runs on google cloud:
+Assignment 3.12 file (mongo.js) is in backend directory. Rest of the application runs on private docker:
 
 http://fs2019.mcfish.info
 
-# Notes on deployment
-
-To deploy:
+# To try out app on local docker
 
 cd express-backend
-docker build . -t gcr.io/fullstack-2019-kurssi/puhelinluettelo:latest
-docker push gcr.io/fullstack-2019-kurssi/puhelinluettelo:latest
+docker build . -t fullstack-2019-kurssi/puhelinluettelo:latest
+docker run -p 3001:3001 -e DB_URL="database_address_goes_here" fullstack-2019-kurssi/puhelinluettelo:latest
 
-To force update on deployment:
-
-kubectl set image deployment/puhelinluettelo puhelinluettelo=gcr.io/fullstack-2019-kurssi/puhelinluettelo
