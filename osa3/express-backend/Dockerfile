@@ -1,9 +1,9 @@
-FROM node:10.15 AS builder
+FROM node:10.16 AS builder
 RUN git clone https://github.com/McFizh/fullstack2019.git
 WORKDIR /fullstack2019/osa3/puhelinluettelo
 RUN npm ci ; npm run build
 
-FROM node:10.15
+FROM node:10.16
 EXPOSE 3001
 WORKDIR /service
 COPY --from=builder /fullstack2019/osa3/puhelinluettelo/build ./build
