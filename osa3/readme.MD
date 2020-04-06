@@ -1,6 +1,4 @@
-Assignment 3.12 file (mongo.js) is in backend directory. Rest of the application runs on private docker:
-
-http://fs2019.mcfish.info
+Assignment 3.12 file (mongo.js) is in backend directory. 
 
 # To try out app on local docker
 
